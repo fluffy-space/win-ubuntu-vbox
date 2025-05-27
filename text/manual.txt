@@ -1,0 +1,59 @@
+Install with guest utils
+
+Username
+admin
+
+Password
+local123
+
+Hostname
+U24P84S6
+
+Domain
+myguest.virtualbox.org
+
+enable copy paste sharing
+
+port forwarding SSH
+3022 to 22
+
+sudo apt install openssh-server
+
+run machine as headless
+
+$
+sudo usermod -aG sudo admin
+
+ssh -p 3022 admin@127.0.0.1
+ssh-keygen -R 127.0.0.1
+
+## passwordless login with file key
+copy keys to ubuntu
+copy pub key to authorized_keys 
+
+VSCode ssh config
+# Read more about SSH config files: https://linux.die.net/man/5/ssh_config
+  Host 127.0.0.1
+    HostName 127.0.0.1
+    Port 3022
+    IdentityFile ~/.ssh/id_ed25519
+
+
+sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
+sudo apt update
+
+Install components and Postgresql
+
+sudo apt-get install -y \
+        libcurl4-openssl-dev       \
+        libbrotli-dev              \
+        libpq-dev                  \
+        libsqlite3-dev             \
+        libssl-dev                 \
+        supervisor                 \
+        unzip                      \
+        zlib1g-dev                 \
+        --no-install-recommends
+
+sudo apt install -y postgresql postgresql-contrib
+

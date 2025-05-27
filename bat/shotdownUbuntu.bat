@@ -1,0 +1,1 @@
+"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" controlvm UP84S6 acpipowerbutton
