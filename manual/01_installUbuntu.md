@@ -4,7 +4,7 @@
 
 Install Ubuntu 24 server from iso (ex.: ubuntu-24.04.2-live-server-amd64.iso)
 
-Set up login and password
+Set up login and password to
 
 admin/local123
 

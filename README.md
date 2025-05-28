@@ -8,4 +8,5 @@ _with Swoole threads, NGINX, PostgreSql_
 - [Build Swoole with threads](./manual/04_installSwoole.md)
 - [Install NGINX](./manual/05_installNginx.md)
 - [Install PostgreSql](./manual/06_installPostgresql.md)
-- [Set up project](./manual/07_setUpProject.md)
+- [Install Node](./manual/07_installNode.md)
+- [Set up project](./manual/08_setUpProject.md)

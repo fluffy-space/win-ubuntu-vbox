@@ -13,7 +13,7 @@ Now you can login with SSH terminal
 
 ssh -p 3022 admin@127.0.0.1
 
-And rub machine as headless
+And run machine as headless
 "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" startvm {Name} --type headless
 "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" startvm UP84S6 --type headless
 
