@@ -14,7 +14,9 @@ Now you can login with SSH terminal
 ssh -p 3022 admin@127.0.0.1
 
 And run machine as headless
+
 "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" startvm {Name} --type headless
+
 "C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" startvm UP84S6 --type headless
 
 Open VsCode and set up new SSH remote environment with string "ssh -p 3022 admin@127.0.0.1"
@@ -36,6 +38,7 @@ On Host machine, generate file key
 ssh-keygen -R 127.0.0.1
 
 Using VsCode, copy/create files on Ubuntu at .ssh location
+
 copy pub key to authorized_keys 
 
 Change VsCode config to use your identity file
