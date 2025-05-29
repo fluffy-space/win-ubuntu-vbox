@@ -4,33 +4,25 @@
 
 Login into Ubuntu
 
+```bash
 sudo apt-get install -y libcurl4-openssl-dev libc-ares-dev postgresql postgresql-contrib libpq-dev
-
 wget https://github.com/swoole/swoole-src/archive/refs/tags/v6.0.2.tar.gz
-
 tar --extract --gzip --file v6.0.2.tar.gz
-
 rm -f v6.0.2.tar.gz
-
 cd swoole-src-6.0.2
-
 phpize && \
-
 ./configure \
-
 --enable-openssl --enable-swoole-curl --enable-cares --enable-swoole-pgsql --enable-swoole-thread
-
 sudo make
 
-If no errors
+# If no errors
 
 sudo make install
-
 php --ini
 
-Add extension
-
+# Add extension
 echo 'extension=swoole.so' | sudo tee -a /usr/local/lib/php.ini
+```
 
 ## Test
 
