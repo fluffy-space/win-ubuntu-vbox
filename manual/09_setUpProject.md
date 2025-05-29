@@ -1,4 +1,4 @@
-# Set up Project 
+# Set up Project
 
 [Go Back](./../README.md)
 
@@ -8,7 +8,52 @@ cd paws-space && \
 mkdir files && \
 mkdir vault && \
 cd vault && \
-echo '{}' | tee values.local.json && \
+echo '{
+    "ADMINS_ARRAY": [
+        {
+            "Email": "yourmail@example.com",
+            "FirstName": "First",
+            "LastName": "Last",
+            "Password": "local123"
+        }
+    ],
+    "HASH_SALT": "<random_hash>",
+    "PG_PORT": 5432,
+    "PG_DB": "<dbname>",
+    "PG_USER": "<username>",
+    "PG_PASSWORD": "<password>"
+}' | tee values.local.json && \
+cd .. && \
+git clone https://github.com/fluffy-space/paws-demo.git && \
+cd paws-demo && \
+composer install && \
+cd viewi-app/js/ && npm install && \
+cd ../..
+```
+
+Example:
+
+```bash
+mkdir paws-space && \
+cd paws-space && \
+mkdir files && \
+mkdir vault && \
+cd vault && \
+echo '{
+    "ADMINS_ARRAY": [
+        {
+            "Email": "pawshub@paws.com",
+            "FirstName": "Fluffy",
+            "LastName": "Paws",
+            "Password": "local123"
+        }
+    ],
+    "HASH_SALT": "456gfdr53$#%$hfUgfhjjdUUUs111",
+    "PG_PORT": 5432,
+    "PG_DB": "paws",
+    "PG_USER": "paws",
+    "PG_PASSWORD": "paws123"
+}' | tee values.local.json && \
 cd .. && \
 git clone https://github.com/fluffy-space/paws-demo.git && \
 cd paws-demo && \
