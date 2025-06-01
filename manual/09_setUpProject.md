@@ -69,6 +69,7 @@ sudo -u postgres createuser <username>
 sudo -u postgres createdb <dbname>
 sudo -u postgres psql -c "alter user <username> with encrypted password '<password>';"
 sudo -u postgres psql -c "grant all privileges on database <dbname> to <username>;"
+sudo -u postgres psql -c "ALTER DATABASE <dbname> OWNER TO <username>;"
 sudo -u postgres psql -c "\c <dbname>;" -c "CREATE EXTENSION citext;"
 ```
 
@@ -79,6 +80,7 @@ sudo -u postgres createuser paws
 sudo -u postgres createdb paws
 sudo -u postgres psql -c "alter user paws with encrypted password 'paws123';"
 sudo -u postgres psql -c "grant all privileges on database paws to paws;"
+sudo -u postgres psql -c "ALTER DATABASE paws OWNER TO paws;"
 sudo -u postgres psql -c "\c paws;" -c "CREATE EXTENSION citext;"
 ```
 
