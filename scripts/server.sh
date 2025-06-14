@@ -2,7 +2,7 @@
 echo "Running server set up"
 
 ## Reading arguments
-PROD = 0
+PROD=0
 while getopts ":prod:help:" opt; do
   case $opt in
     prod) PROD=1 ;;
