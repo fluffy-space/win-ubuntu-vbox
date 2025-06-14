@@ -3,23 +3,44 @@ echo "Running server set up"
 
 ## Reading arguments
 PROD=0
-while getopts ":prod:help:" opt; do
-  case $opt in
-    prod) PROD=1 ;;
-    help) echo "Help value: $OPTARG" ;;
-    \?) echo "Invalid option: -$OPTARG" ;;
-  esac
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --prod)
+            echo "Using production mode."
+            PROD=1
+            shift
+            ;;
+        --help)
+            version="$2"
+            shift 2
+            ;;
+        --verbose)
+            verbose=true
+            shift
+            ;;
+        --rebuild)
+            rebuild=true
+            shift
+            ;;
+        --dryrun)
+            dryrun=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
 done
 
 printf "Argument prod is %s\n" "$PROD"
 
-if ["$PROD" -eq 1]; then
+if [ "$PROD" -eq 1 ]; then
     echo "Using php.ini production"
 else
     echo "Using php.ini development"
 fi
-
-exit 1
 
 ## Installing SSH
 apt install openssh-server -y
@@ -65,3 +86,41 @@ echo 'extension=inotify.so' | tee -a /usr/local/lib/php.ini
 echo 'extension=redis.so' | tee -a /usr/local/lib/php.ini
 php -v
 
+## Install Swoole
+
+apt-get install -y libcurl4-openssl-dev libc-ares-dev postgresql postgresql-contrib libpq-dev
+wget https://github.com/swoole/swoole-src/archive/refs/tags/v6.0.2.tar.gz
+tar --extract --gzip --file v6.0.2.tar.gz
+rm -f v6.0.2.tar.gz
+cd swoole-src-6.0.2
+phpize && \
+./configure \
+--enable-openssl --enable-swoole-curl --enable-cares --enable-swoole-pgsql --enable-swoole-thread
+make
+make install
+
+echo 'extension=swoole.so' | tee -a /usr/local/lib/php.ini
+
+## NGINX
+
+apt install -y nginx
+ufw app list
+ufw allow 'Nginx HTTP' && \
+ufw allow 'Nginx HTTPS'
+ufw app list
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
+systemctl status nginx
+
+## Postgresql
+
+apt update
+apt install -y postgresql postgresql-contrib libpq-dev
+systemctl start postgresql.service
+systemctl status postgresql.service
+apt install -y redis-server
+systemctl status redis
+
+## Node js
+
+apt update
+apt install -y nodejs npm
