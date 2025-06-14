@@ -11,8 +11,8 @@ while getopts ":prod:help:" opt; do
   esac
 done
 
-printf "Argument p_out is %s\n" "$p_out"
-printf "Argument arg_1 is %s\n" "$arg_1"
+printf "Argument prod is %s\n" "$PROD"
+exit 1
 
 ## Installing SSH
 apt install openssh-server -y
