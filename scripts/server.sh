@@ -2,10 +2,10 @@
 echo "Running server set up"
 
 ## Reading arguments
-PROD = false
+PROD = 0
 while getopts ":prod:help:" opt; do
   case $opt in
-    prod) PROD=true ;;
+    prod) PROD=1 ;;
     help) echo "Help value: $OPTARG" ;;
     \?) echo "Invalid option: -$OPTARG" ;;
   esac
@@ -43,7 +43,7 @@ cd "php-src-php-$PHP_VER"
 make -j4
 make install
 
-if [PROD]; then
+if ["$PROD" -eq 0]; then
     cp ./php.ini-production /usr/local/lib/php.ini
 else
     cp ./php.ini-development /usr/local/lib/php.ini
