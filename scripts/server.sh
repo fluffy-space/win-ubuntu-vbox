@@ -13,6 +13,14 @@ done
 
 printf "Argument prod is %s\n" "$PROD"
 
+if ["$PROD" -eq 1]; then
+    echo "Using php.ini production"
+else
+    echo "Using php.ini development"
+fi
+
+exit 1
+
 ## Installing SSH
 apt install openssh-server -y
 
