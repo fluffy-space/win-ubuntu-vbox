@@ -7,7 +7,7 @@ Configure port forwarding for SSH on VM
 
 Login into Ubuntu
 
-sudo apt install openssh-server
+sudo apt install openssh-server -y
 
 Now you can login with SSH terminal
 
