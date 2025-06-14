@@ -56,6 +56,9 @@ echo '{
 }' | tee values.local.json && \
 cd .. && \
 git clone https://github.com/fluffy-space/paws-demo.git && \
+sudo chown $USER:$USER -R ./ && \
+sudo chown www-data:www-data -R ./ && \
+sudo chmod -R 777 ./ && \
 cd paws-demo && \
 composer install && \
 cd viewi-app/js/ && npm install && \

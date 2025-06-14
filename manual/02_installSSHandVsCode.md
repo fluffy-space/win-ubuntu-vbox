@@ -48,4 +48,18 @@ Change VsCode config to use your identity file
     Port 3022
     IdentityFile ~/.ssh/id_ed25519
 
+## Restore ownership
+
+SSH logs:
+
+sudo cat /var/log/auth.log
+
+sudo chown -R admin:admin /home/admin
+
+chmod go-w /home/admin
+
+chmod 700 /home/admin/.ssh
+
+chmod 600 /home/admin/.ssh/authorized_keys
+
 [Go Back](./../README.md)
