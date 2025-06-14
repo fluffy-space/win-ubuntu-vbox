@@ -12,7 +12,6 @@ while getopts ":prod:help:" opt; do
 done
 
 printf "Argument prod is %s\n" "$PROD"
-exit 1
 
 ## Installing SSH
 apt install openssh-server -y
@@ -43,9 +42,11 @@ cd "php-src-php-$PHP_VER"
 make -j4
 make install
 
-if ["$PROD" -eq 0]; then
+if ["$PROD" -eq 1]; then
+    echo "Using php.ini production"
     cp ./php.ini-production /usr/local/lib/php.ini
 else
+    echo "Using php.ini development"
     cp ./php.ini-development /usr/local/lib/php.ini
 fi
 
