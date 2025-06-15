@@ -108,7 +108,8 @@ ufw app list
 ufw allow 'Nginx HTTP' && \
 ufw allow 'Nginx HTTPS'
 ufw app list
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=US/ST=LA/L=Mirage/O=Dis/CN=www.example.com" \
+-keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
 systemctl status nginx
 
 ## Postgresql
@@ -117,6 +118,9 @@ apt update
 apt install -y postgresql postgresql-contrib libpq-dev
 systemctl start postgresql.service
 systemctl status postgresql.service
+
+## Redis
+
 apt install -y redis-server
 systemctl status redis
 
