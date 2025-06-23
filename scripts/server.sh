@@ -36,12 +36,6 @@ done
 
 printf "Argument prod is %s\n" "$PROD"
 
-if [ "$PROD" -eq 1 ]; then
-    echo "Using php.ini production"
-else
-    echo "Using php.ini development"
-fi
-
 ## Installing SSH
 apt install openssh-server -y
 
@@ -70,6 +64,13 @@ cd "php-src-php-$PHP_VER"
 --enable-zts --with-openssl --with-zlib --enable-bcmath --with-curl --enable-mbstring --with-pdo-mysql --with-pdo-pgsql --with-pgsql --enable-sockets --enable-soap
 make -j4
 make install
+
+PHP_INSTALLED_VERSION=$(php -r "echo PHP_VERSION;")
+
+if ["$PHP_INSTALLED_VERSION" != "$PHP_VER"]; then
+    echo "PHP $PHP_VER installation failed."
+    exit 1;
+fi
 
 if ["$PROD" -eq 1]; then
     echo "Using php.ini production"
