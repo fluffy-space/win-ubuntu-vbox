@@ -51,7 +51,7 @@ chmod -R 777 ./
 PHP_VER='8.4.7'
 PHP_MAJOR="${PHP_VER:0:1}"
 echo "Installing PHP $PHP_VER"
-apt install -y pkg-config build-essential autoconf bison re2c \
+apt install -y pkg-config build-essential autoconf bison re2c postgresql postgresql-contrib libpq-dev \
                libcurl4-openssl-dev openssl libssl-dev libxml2-dev libsqlite3-dev zlib1g-dev libonig-dev
 wget "https://github.com/php/php-src/archive/php-$PHP_VER.tar.gz"
 tar --extract --gzip --file "php-$PHP_VER.tar.gz"
@@ -117,7 +117,6 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=US/ST=LA/L=Mirage/
 ## Postgresql
 
 apt update
-apt install -y postgresql postgresql-contrib libpq-dev
 systemctl start postgresql.service
 
 ## Redis
