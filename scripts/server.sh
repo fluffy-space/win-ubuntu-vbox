@@ -67,7 +67,7 @@ make install
 
 PHP_INSTALLED_VERSION=$(php -r "echo PHP_VERSION;")
 
-if ["$PHP_INSTALLED_VERSION" != "$PHP_VER"]; then
+if [[ "$PHP_INSTALLED_VERSION" != "$PHP_VER" ]]; then
     echo "PHP $PHP_VER installation failed."
     exit 1;
 else
