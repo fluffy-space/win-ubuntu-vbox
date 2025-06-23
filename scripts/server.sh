@@ -52,7 +52,7 @@ PHP_VER='8.4.7'
 PHP_MAJOR="${PHP_VER:0:1}"
 echo "Installing PHP $PHP_VER"
 apt install -y pkg-config build-essential autoconf bison re2c \
-                    libxml2-dev libsqlite3-dev zlib1g-dev libonig-dev
+               libcurl4-openssl-dev openssl libxml2-dev libsqlite3-dev zlib1g-dev libonig-dev
 wget "https://github.com/php/php-src/archive/php-$PHP_VER.tar.gz"
 tar --extract --gzip --file "php-$PHP_VER.tar.gz"
 rm -f "php-$PHP_VER.tar.gz"
@@ -74,8 +74,6 @@ else
     "PHP $PHP_VER successfully installed."
 fi
 
-exit 1;
-
 if ["$PROD" -eq 1]; then
     echo "Using php.ini production"
     cp ./php.ini-production /usr/local/lib/php.ini
@@ -93,7 +91,7 @@ php -v
 
 ## Install Swoole
 
-apt-get install -y libcurl4-openssl-dev libc-ares-dev postgresql postgresql-contrib libpq-dev
+apt-get install -y  libc-ares-dev postgresql postgresql-contrib libpq-dev
 wget https://github.com/swoole/swoole-src/archive/refs/tags/v6.0.2.tar.gz
 tar --extract --gzip --file v6.0.2.tar.gz
 rm -f v6.0.2.tar.gz
