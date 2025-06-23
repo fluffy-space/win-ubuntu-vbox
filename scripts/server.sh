@@ -70,7 +70,11 @@ PHP_INSTALLED_VERSION=$(php -r "echo PHP_VERSION;")
 if ["$PHP_INSTALLED_VERSION" != "$PHP_VER"]; then
     echo "PHP $PHP_VER installation failed."
     exit 1;
+else
+    "PHP $PHP_VER successfully installed."
 fi
+
+exit 1;
 
 if ["$PROD" -eq 1]; then
     echo "Using php.ini production"
