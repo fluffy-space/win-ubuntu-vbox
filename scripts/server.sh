@@ -58,9 +58,10 @@ tar --extract --gzip --file "php-$PHP_VER.tar.gz"
 rm -f "php-$PHP_VER.tar.gz"
 cd "php-src-php-$PHP_VER"
 ./buildconf --force
-./configure --prefix="/usr/local/php${PHP_MAJOR}" \
---with-config-file-path="/etc/php${PHP_MAJOR}/cli" \
---with-config-file-scan-dir="/etc/php${PHP_MAJOR}/cli/conf.d/" \
+## --prefix="/usr/local/php${PHP_MAJOR}" - use for multiple versions
+## --with-config-file-path="/etc/php${PHP_MAJOR}/cli" \
+## --with-config-file-scan-dir="/etc/php${PHP_MAJOR}/cli/conf.d/" \
+./configure \
 --enable-zts --with-openssl --with-zlib --enable-bcmath --with-curl --enable-mbstring --with-pdo-mysql --with-pdo-pgsql --with-pgsql --enable-sockets --enable-soap
 make -j4
 make install
