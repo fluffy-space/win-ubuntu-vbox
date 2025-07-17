@@ -87,11 +87,29 @@ sudo -u postgres psql -c "ALTER DATABASE paws OWNER TO paws;"
 sudo -u postgres psql -c "\c paws;" -c "CREATE EXTENSION citext;"
 ```
 
+Reset git file mod
+
+```bash
+git config core.filemode false
+```
+
+```bash
+php fluffy build local
+```
+
 Run migration
 
 ```bash
 php fluffy migrate
 ```
+
+Set up Nginx server for proxy and domain
+
+```bash
+sudo php fluffy nginx paws-demo.wsl.com
+```
+
+*make sure you include this domain into your local DNS, hosts on Windows*
 
 Open VsCode
 
