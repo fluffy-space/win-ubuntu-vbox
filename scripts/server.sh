@@ -36,6 +36,8 @@ done
 
 printf "Argument prod is %s\n" "$PROD"
 
+apt update -y
+
 ## Installing SSH
 apt install openssh-server -y
 
@@ -75,7 +77,7 @@ else
     "PHP $PHP_VER successfully installed."
 fi
 
-if ["$PROD" -eq 1]; then
+if [[ "$PROD" -eq 1 ]]; then
     echo "Using php.ini production"
     cp ./php.ini-production /usr/local/lib/php.ini
 else
