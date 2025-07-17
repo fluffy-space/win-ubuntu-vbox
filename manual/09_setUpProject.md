@@ -87,6 +87,12 @@ sudo -u postgres psql -c "ALTER DATABASE paws OWNER TO paws;"
 sudo -u postgres psql -c "\c paws;" -c "CREATE EXTENSION citext;"
 ```
 
+Run migration
+
+```bash
+php fluffy migrate
+```
+
 Open VsCode
 
 ```bash
