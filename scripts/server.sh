@@ -74,7 +74,7 @@ if [[ "$PHP_INSTALLED_VERSION" != "$PHP_VER" ]]; then
     echo "PHP $PHP_VER installation failed."
     exit 1;
 else
-    "PHP $PHP_VER successfully installed."
+    echo "PHP $PHP_VER successfully installed."
 fi
 
 if [[ "$PROD" -eq 1 ]]; then
