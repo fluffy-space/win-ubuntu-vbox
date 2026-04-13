@@ -54,7 +54,7 @@ PHP_VER='8.5.5'
 PHP_MAJOR="${PHP_VER:0:1}"
 echo "Installing PHP $PHP_VER"
 apt install -y pkg-config build-essential autoconf bison re2c postgresql postgresql-contrib libpq-dev \
-               libcurl4-openssl-dev openssl libssl-dev libxml2-dev libsqlite3-dev zlib1g-dev libonig-dev libssh2-1-dev
+               libcurl4-openssl-dev openssl libssl-dev libxml2-dev libsqlite3-dev zlib1g-dev libonig-dev libssh2-1-dev liburing-dev
 wget "https://github.com/php/php-src/archive/php-$PHP_VER.tar.gz"
 tar --extract --gzip --file "php-$PHP_VER.tar.gz"
 rm -f "php-$PHP_VER.tar.gz"
@@ -76,6 +76,8 @@ if [[ "$PHP_INSTALLED_VERSION" != "$PHP_VER" ]]; then
 else
     echo "PHP $PHP_VER successfully installed."
 fi
+
+rm -f /usr/local/lib/php.ini
 
 if [[ "$PROD" -eq 1 ]]; then
     echo "Using php.ini production"
