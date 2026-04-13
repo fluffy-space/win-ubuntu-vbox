@@ -103,7 +103,7 @@ rm -f v6.2.0.tar.gz
 cd swoole-src-6.2.0
 phpize && \
 ./configure \
---enable-openssl --enable-swoole-curl --enable-cares --enable-swoole-pgsql --enable-swoole-thread --enable-swoole-ftp --with-swoole-ssh2 --enable-uring_socket --enable-iouring
+--enable-openssl --enable-swoole-curl --enable-cares --enable-swoole-pgsql --enable-swoole-thread --enable-swoole-ftp --with-swoole-ssh2
 make
 make install
 
