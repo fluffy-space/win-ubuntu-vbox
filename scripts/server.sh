@@ -50,7 +50,7 @@ chmod -R 777 ./
 
 ## Installing PHP
 
-PHP_VER='8.4.7'
+PHP_VER='8.5.5'
 PHP_MAJOR="${PHP_VER:0:1}"
 echo "Installing PHP $PHP_VER"
 apt install -y pkg-config build-essential autoconf bison re2c postgresql postgresql-contrib libpq-dev \
@@ -95,13 +95,13 @@ php -v
 ## Install Swoole
 
 apt-get install -y  libc-ares-dev postgresql postgresql-contrib libpq-dev
-wget https://github.com/swoole/swoole-src/archive/refs/tags/v6.0.2.tar.gz
-tar --extract --gzip --file v6.0.2.tar.gz
-rm -f v6.0.2.tar.gz
-cd swoole-src-6.0.2
+wget https://github.com/swoole/swoole-src/archive/refs/tags/v6.2.0.tar.gz
+tar --extract --gzip --file v6.2.0.tar.gz
+rm -f v6.2.0.tar.gz
+cd swoole-src-6.2.0
 phpize && \
 ./configure \
---enable-openssl --enable-swoole-curl --enable-cares --enable-swoole-pgsql --enable-swoole-thread
+--enable-openssl --enable-swoole-curl --enable-cares --enable-swoole-pgsql --enable-swoole-thread --enable-swoole-ftp --with-swoole-ssh2 --enable-uring_socket --enable-iouring
 make
 make install
 
