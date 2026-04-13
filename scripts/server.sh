@@ -50,6 +50,8 @@ chmod -R 777 ./
 
 ## Installing PHP
 
+rm -f /usr/local/lib/php.ini
+
 PHP_VER='8.5.5'
 PHP_MAJOR="${PHP_VER:0:1}"
 echo "Installing PHP $PHP_VER"
@@ -76,8 +78,6 @@ if [[ "$PHP_INSTALLED_VERSION" != "$PHP_VER" ]]; then
 else
     echo "PHP $PHP_VER successfully installed."
 fi
-
-rm -f /usr/local/lib/php.ini
 
 if [[ "$PROD" -eq 1 ]]; then
     echo "Using php.ini production"
