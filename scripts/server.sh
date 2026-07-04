@@ -8,19 +8,18 @@ usage() {
     cat <<'USAGE'
 Usage: sudo bash server.sh [options]
 
-  --prod                 Production mode: php.ini-production + real Let's Encrypt TLS (Caddy).
-  --webserver caddy|nginx  Edge reverse proxy / TLS termination. Default: caddy.
-  --email <address>      ACME account email for Let's Encrypt renewal notices (prod Caddy).
+  --prod                 Production mode: php.ini-production.
+  --email <address>      ACME account email for a real cert (certbot/acme on a public prod domain).
   --help                 Show this help and exit.
 
+The edge proxy is OpenResty (nginx + Lua) — no --webserver choice.
 Versions can be overridden via env: PHP_VER, SWOOLE_VER, NODE_MAJOR.
 USAGE
 }
 
 ## Reading arguments
 PROD=0
-WEBSERVER="${WEBSERVER:-caddy}"   # caddy (default) | nginx
-CADDY_EMAIL="${CADDY_EMAIL:-}"
+ACME_EMAIL="${ACME_EMAIL:-}"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -29,14 +28,9 @@ while [[ $# -gt 0 ]]; do
             PROD=1
             shift
             ;;
-        --webserver)
-            # Edge web server / reverse proxy: caddy (default) or nginx.
-            WEBSERVER="$2"
-            shift 2
-            ;;
         --email)
-            # ACME account email for Let's Encrypt (prod TLS renewal notices).
-            CADDY_EMAIL="$2"
+            # ACME account email for a real cert (certbot/acme on a public prod domain).
+            ACME_EMAIL="$2"
             shift 2
             ;;
         --help)
@@ -135,79 +129,70 @@ make install
 
 echo 'extension=swoole.so' | tee -a /usr/local/lib/php.ini
 
-## Web server (edge reverse proxy + TLS): caddy (default) or nginx
+## Web server (edge reverse proxy + TLS): OpenResty (nginx + Lua)
+##
+## OpenResty = nginx + LuaJIT + lua-resty-* — plain nginx for primary domains,
+## with the Lua module we need for per-SNI custom-domain TLS. Installs the apt
+## repo + package, the /etc/nginx layout (so `php fluffy nginx <domain>` works),
+## the shared http-context tuning (upstream keepalive map + TLS session cache),
+## a dev self-signed cert, and the firewall. Per-domain site files are generated
+## later by:  sudo php fluffy nginx <domain>
+##
+## (Fluffy ships the same as a standalone, more thorough installer:
+##  vendor/fluffy-space/fluffy/scripts/install-openresty-ubuntu24.sh)
 
-if [[ "$WEBSERVER" == "caddy" ]]; then
+# Official OpenResty apt repo (signed).
+apt install -y ca-certificates curl gnupg lsb-release openssl
+curl -1fsSL 'https://openresty.org/package/pubkey.gpg' \
+    | gpg --dearmor -o /usr/share/keyrings/openresty.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/openresty.gpg] http://openresty.org/package/ubuntu $(lsb_release -sc) main" \
+    | tee /etc/apt/sources.list.d/openresty.list
+apt update
+apt install -y openresty
 
-    ## Caddy — edge reverse proxy + automatic TLS
-    ##
-    ## Sets up the Caddy infrastructure only: apt repo, package, firewall, and a
-    ## managed /etc/caddy/Caddyfile that imports per-domain site files. The site
-    ## files themselves are generated later by:  sudo php fluffy caddy <domain>
+# Firewall: 80 (HTTP->HTTPS + ACME) and 443 (TLS).
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw app list
 
-    # Official Caddy apt repo (signed).
-    apt install -y debian-keyring debian-archive-keyring apt-transport-https ca-certificates curl gnupg
-    curl -1fsSL 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
-        | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-    curl -1fsSL 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' \
-        | tee /etc/apt/sources.list.d/caddy-stable.list
-    apt update
-    apt install -y caddy
+# /etc/nginx layout wired into OpenResty's main config (NginxBuilder writes here).
+mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled /etc/nginx/conf.d
 
-    # Firewall: Caddy needs 80 (ACME challenge + HTTP->HTTPS redirect) and 443 (TLS).
-    ufw allow 80/tcp
-    ufw allow 443/tcp
-    ufw app list
+# Shared http-context tuning the per-site template depends on.
+tee /etc/nginx/conf.d/00-fluffy-tuning.conf >/dev/null <<'TUNING'
+map $http_upgrade $connection_upgrade { default upgrade; '' ''; }
+ssl_session_cache   shared:SSL:50m;
+ssl_session_timeout 1d;
+ssl_session_tickets off;
+ssl_protocols       TLSv1.2 TLSv1.3;
+resolver 127.0.0.53 ipv6=off valid=30s;
+TUNING
 
-    # Managed main Caddyfile: global options + `import sites/*.caddy`. Per-domain
-    # configs drop into /etc/caddy/sites/ (via `php fluffy caddy <domain>`).
-    mkdir -p /etc/caddy/sites
-    if [[ "$PROD" -eq 1 ]]; then
-        # Prod: real Let's Encrypt certs (needs public DNS + reachable 80/443).
-        echo "Configuring Caddy for production TLS (email: ${CADDY_EMAIL:-<unset>})"
-        tee /etc/caddy/Caddyfile >/dev/null <<CADDYFILE
-{
-$( [[ -n "$CADDY_EMAIL" ]] && printf '\temail %s\n' "$CADDY_EMAIL" )
-	grace_period 30s
-	admin 127.0.0.1:2019
+tee /usr/local/openresty/nginx/conf/nginx.conf >/dev/null <<'MAIN'
+user  www-data;
+worker_processes  auto;
+worker_rlimit_nofile 65535;
+events { worker_connections 16384; multi_accept on; }
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    sendfile on; tcp_nopush on; tcp_nodelay on;
+    keepalive_timeout 65;
+    server_tokens off;
+    lua_shared_dict fluffy_tls 16m;
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
 }
+MAIN
 
-import /etc/caddy/sites/*.caddy
-CADDYFILE
-    else
-        # Dev/VM: Caddy's internal CA (self-signed). No public DNS or email needed.
-        # Trust it in the guest browser once with: sudo caddy trust
-        echo "Configuring Caddy for dev TLS (internal self-signed CA)"
-        tee /etc/caddy/Caddyfile >/dev/null <<'CADDYFILE'
-{
-	grace_period 30s
-	admin 127.0.0.1:2019
-}
-
-import /etc/caddy/sites/*.caddy
-CADDYFILE
-    fi
-
-    caddy validate --config /etc/caddy/Caddyfile
-    systemctl enable caddy
-    systemctl restart caddy
-
-elif [[ "$WEBSERVER" == "nginx" ]]; then
-
-    ## NGINX
-
-    apt install -y nginx
-    ufw app list
-    ufw allow 'Nginx HTTP' && \
-    ufw allow 'Nginx HTTPS'
-    ufw app list
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=US/ST=LA/L=Mirage/O=Dis/CN=www.example.com" \
+# Dev self-signed cert (real cert via certbot/acme for public prod domains).
+openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+    -subj "/CN=localhost" \
     -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
 
-else
-    echo "Unknown --webserver '$WEBSERVER' (expected: caddy | nginx)"
-    exit 1
-fi
+/usr/local/openresty/bin/openresty -t
+systemctl enable openresty
+systemctl restart openresty
 
 ## Postgresql
 

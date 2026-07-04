@@ -11,6 +11,6 @@
     missing (inotify, redis, swoole).
   - Back up the current binaries/ini before swapping; verify `php -v` and the
     loaded Swoole version afterward and roll back on failure.
-  - Restart the app + Caddy/nginx after a successful upgrade.
+  - Restart the app + OpenResty (nginx) after a successful upgrade.
   - Keep the `PHP_VER` / `SWOOLE_VER` defaults in `server.sh` in sync (single
     source of truth, or share a small `versions.env`).

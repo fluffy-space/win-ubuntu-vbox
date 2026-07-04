@@ -103,10 +103,10 @@ Run migration
 php fluffy migrate
 ```
 
-Set up Caddy server for proxy and domain (reverse proxy + automatic TLS)
+Generate the per-domain OpenResty (nginx) site config (reverse proxy + TLS)
 
 ```bash
-sudo php fluffy caddy paws-demo.wsl.com
+sudo php fluffy nginx paws-demo.wsl.com
 ```
 
 *make sure you include this domain into your local DNS, hosts on Windows*
