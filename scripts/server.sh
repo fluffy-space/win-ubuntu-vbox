@@ -157,6 +157,9 @@ ufw app list
 
 # /etc/nginx layout wired into OpenResty's main config (NginxBuilder writes here).
 mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled /etc/nginx/conf.d
+# Per-site template logs to /var/log/nginx (OpenResty uses its own logs/ dir).
+mkdir -p /var/log/nginx
+chown www-data:adm /var/log/nginx 2>/dev/null || true
 
 # Shared http-context tuning the per-site template depends on.
 tee /etc/nginx/conf.d/00-fluffy-tuning.conf >/dev/null <<'TUNING'
