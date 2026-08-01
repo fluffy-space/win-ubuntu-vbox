@@ -49,7 +49,9 @@ printf "Argument prod is %s\n" "$PROD"
 
 ## Versions — bump these to upgrade (overridable via env; see TODO.md)
 PHP_VER="${PHP_VER:-8.5.7}"
-SWOOLE_VER="${SWOOLE_VER:-6.2.1}"
+## >= 6.2 is REQUIRED: the coroutine SSH client (--with-swoole-ssh2) lands in 6.2.0, and the
+## Urlicer deploy pipeline drives remote boxes over SSH from inside a worker. 6.2.2 verified.
+SWOOLE_VER="${SWOOLE_VER:-6.2.2}"
 NODE_MAJOR="${NODE_MAJOR:-22}"
 PHP_MAJOR="${PHP_VER:0:1}"
 
@@ -121,6 +123,9 @@ wget "https://github.com/swoole/swoole-src/archive/refs/tags/v$SWOOLE_VER.tar.gz
 tar --extract --gzip --file "v$SWOOLE_VER.tar.gz"
 rm -f "v$SWOOLE_VER.tar.gz"
 cd "swoole-src-$SWOOLE_VER"
+## --with-swoole-ssh2 / --enable-swoole-ftp: coroutine SSH + FTP clients (Swoole >= 6.2). They
+## expose the SAME function names as PECL ext-ssh2 / ext-ftp but yield instead of blocking, and
+## they CANNOT coexist with those extensions — so never `pecl install ssh2` on this box.
 phpize && \
 ./configure \
 --enable-openssl --enable-swoole-curl --enable-cares --enable-swoole-pgsql --enable-swoole-thread --enable-swoole-ftp --with-swoole-ssh2
@@ -128,6 +133,20 @@ make -j"$(nproc)"
 make install
 
 echo 'extension=swoole.so' | tee -a /usr/local/lib/php.ini
+
+## Verify the build the same way PHP itself is verified above — a Swoole that compiled but
+## didn't pick up libssh2 loads perfectly happily and only fails at the first deploy.
+SWOOLE_INSTALLED_VERSION=$(php -r "echo swoole_version();" 2>/dev/null || echo "none")
+if [[ "$SWOOLE_INSTALLED_VERSION" != "$SWOOLE_VER" ]]; then
+    echo "Swoole $SWOOLE_VER installation failed (loaded: $SWOOLE_INSTALLED_VERSION)."
+    exit 1
+fi
+if ! php --ri swoole 2>/dev/null | grep -qiE 'ssh2.*=>.*enabled'; then
+    echo "Swoole $SWOOLE_VER installed WITHOUT ssh2 support — deployments will not work."
+    echo "Check that libssh2-1-dev was present before ./configure, then rebuild."
+    exit 1
+fi
+echo "Swoole $SWOOLE_VER successfully installed (ssh2: enabled)."
 
 ## Web server (edge reverse proxy + TLS): OpenResty (nginx + Lua)
 ##
