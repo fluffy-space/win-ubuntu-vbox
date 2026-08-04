@@ -169,6 +169,12 @@ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/openresty.gpg] http://openre
 apt update
 apt install -y openresty
 
+# certbot: real certificates for public domains, issued later by prod/60-certificates.sh in
+# WEBROOT mode. Deliberately not python3-certbot-nginx — the --nginx installer plugin only
+# understands stock nginx and would rewrite the generated site files; the cert is picked up by
+# `php fluffy nginx <domain>` instead, which reads /etc/letsencrypt/live/<domain>.
+apt install -y certbot
+
 # Firewall: 80 (HTTP->HTTPS + ACME) and 443 (TLS).
 ufw allow 80/tcp
 ufw allow 443/tcp
