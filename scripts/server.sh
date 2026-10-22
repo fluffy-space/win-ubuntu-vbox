@@ -48,7 +48,7 @@ done
 printf "Argument prod is %s\n" "$PROD"
 
 ## Versions — bump these to upgrade (overridable via env; see TODO.md)
-PHP_VER="${PHP_VER:-8.5.7}"
+PHP_VER="${PHP_VER:-8.5.12}"
 ## >= 6.2 is REQUIRED: the coroutine SSH client (--with-swoole-ssh2) lands in 6.2.0, and the
 ## Urlicer deploy pipeline drives remote boxes over SSH from inside a worker. 6.2.2 verified.
 SWOOLE_VER="${SWOOLE_VER:-6.2.2}"
